@@ -8,21 +8,36 @@ $(document).ready(() => {
 
     $('form').each(function () { // For some reason, () => {} doesn't work as a function here?
         
-        var form = {
-            'id': $(this).attr('id'),
-            'type': $(this).attr('name'),
-            'object': {
-                'jquery': $(this),
-                'dom': this
-            },
-            'fields': [], // formerly data
-            'privacy': {
-                'input': $('#' + $(this).attr('id') + ' input[data-privacy="true"]'),
-                'valid': null,
-            },
-            'valid': false,
-            'message': $(`.status-message#complete[data-form='${$(this).attr('id')}']`),
-            'action': $(this).attr('action')
+        if (config.privacy.enabled) {
+            var form = {
+                'id': $(this).attr('id'),
+                'type': $(this).attr('name'),
+                'object': {
+                    'jquery': $(this),
+                    'dom': this
+                },
+                'fields': [],
+                'privacy': {
+                    'input': $('#' + $(this).attr('id') + ' input[data-privacy="true"]'),
+                    'valid': null,
+                },
+                'valid': false,
+                'message': $(`.${config.messages.elementClass}#complete[data-form='${$(this).attr('id')}']`),
+                'action': $(this).attr('action')
+            }
+        } else {
+            var form = {
+                'id': $(this).attr('id'),
+                'type': $(this).attr('name'),
+                'object': {
+                    'jquery': $(this),
+                    'dom': this
+                },
+                'fields': [], 
+                'valid': false,
+                'message': $(`.${config.messages.elementClass}#complete[data-form='${$(this).attr('id')}']`),
+                'action': $(this).attr('action')
+            }
         }
        
         forms.push(form)
@@ -84,7 +99,7 @@ $(document).ready(() => {
                 form.message.animate({
                     opacity: 1
                 }, 1000)
-                form.message.text('Thank you very much! We\'ve got your message and will be in touch with you soon.')
+                form.message.text(config.messages.success)
                 $('#' + form.id + ' input#submit').attr('disabled', true) /* Enable the submit button again */
                 console.log('Complete: ', response)
                 resetForm(form) /* Reset the form */
@@ -105,7 +120,7 @@ $(document).ready(() => {
                     opacity: 1
                 }, 1000)
                 console.log('Error: ', error)
-                form.message.text('Sorry, something went wrong. Try refreshing and filling out the form again.')
+                form.message.text(config.messages.error)
                 form.message.animate({
                     opacity: 0
                 }, {
@@ -126,17 +141,23 @@ $(document).ready(() => {
         })
         if (isTrue) {
             /* and if it all is true... */
-            if (form.privacy.valid) {
-                /* ... and if the privacy is valid as well */
+            if (config.privacy) {
+                if (form.privacy.valid || !config.privacy) {
+                    /* ... and if the privacy is valid as well */
+                    form.valid = true; /* then the whole form is valid */
+                    $(`#${form.id} #submit`).val('Send') /* enable the send button */
+                    $(`#${form.id} #submit`).attr('disabled', false)
+                } else {
+                    /* ... but the privacy hasn't been accepted */
+                    form.valid = false; /* form isn't valid */
+                    $(`#${form.id} #submit`).val('Enter details')
+                    $(`#${form.id} #submit`).attr('disabled', true)
+                    $(`#${form.id} .${config.messages.elementClass}#${form.privacy.input.attr('id')}`).html('Please accept privacy terms') /* prompt to accept privacy terms */
+                }
+            } else {
                 form.valid = true; /* then the whole form is valid */
                 $(`#${form.id} #submit`).val('Send') /* enable the send button */
                 $(`#${form.id} #submit`).attr('disabled', false)
-            } else {
-                /* ... but the privacy hasn't been accepted */
-                form.valid = false; /* form isn't valid */
-                $(`#${form.id} #submit`).val('Enter details')
-                $(`#${form.id} #submit`).attr('disabled', true)
-                $(`#${form.id} .status-message#${form.privacy.input.attr('id')}`).html('Please accept privacy terms') /* prompt to accept privacy terms */
             }
         } else {
             form.valid = false; /* form isn't valid */
@@ -166,7 +187,7 @@ $(document).ready(() => {
                         /* set to null to avoid triggering error message early */
                         'focus': false,
                         /* hasn't been focused yet */
-                        'message': $(`.status-message#${$(this).attr('id')}`), /* the status message for the element. */
+                        'message': $(`.${config.messages.elementClass}#${$(this).attr('id')}`), /* the status message for the element. */
                         'phone': null
                     };
                 } else {
@@ -178,7 +199,7 @@ $(document).ready(() => {
                         /* get related jquery element */
                         'valid': null,
                         'focus': false,
-                        'message': $(`.status-message#${$(this).attr('id')}`)
+                        'message': $(`.${config.messages.elementClass}#${$(this).attr('id')}`)
                         /* 'errorMsg': '' */
                     };
                 }
@@ -192,19 +213,26 @@ $(document).ready(() => {
         form.fields.forEach((input) => {
             if (input.type=='tel') { /* add a phone value in it's constructor? */
                 if (config.intlTelInput.enabled) {
-                    input.phone = window.intlTelInput(input.element, { /* create intlTelInput on our phone input */
-                        preferredCountries: ["gb", "us", "ca"],
-                        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
-                        separateDialCode: true,
-                        /* unquote if you want to use auto-location */
-                        /* initialCountry: "auto",
-                        geoIpLookup: function(success, failure) {
-                            $.get("https://ipinfo.io/json?token=fae0e1cf113467", function() {}, "jsonp").always(function(resp) {
-                                var countryCode = (resp && resp.country) ? resp.country : "gb";
-                                success(countryCode);
-                            });
-                        }, */
-                    })
+                    if (config.intlTelInput.geoIpLookup.enabled) {
+                        input.phone = window.intlTelInput(input.element, { /* create intlTelInput on our phone input */
+                            preferredCountries: config.intlTelInput.preferredCountries ? config.intlTelInput.preferredCountries : ['us', 'gb'], 
+                            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+                            separateDialCode: true,
+                            initialCountry: "auto",
+                            geoIpLookup: function(success, failure) {
+                                $.get(config.intlTelInput.geoIpLookup.url, function() {}, "jsonp").always(function(resp) {
+                                    var countryCode = (resp && resp.country) ? resp.country : "gb";
+                                    success(countryCode);
+                                });
+                            },
+                        })
+                    } else {
+                        input.phone = window.intlTelInput(input.element, { /* create intlTelInput on our phone input */
+                            preferredCountries: config.intlTelInput.preferredCountries ? config.intlTelInput.preferredCountries : ['us', 'gb'],
+                            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+                            separateDialCode: true,
+                        })
+                    }
 
                     phoneInputs.push(input.phone)
                 } else {
@@ -355,12 +383,12 @@ $(document).ready(() => {
             if (privacyFocus) {
                 if (form.privacy.input.is(':checked')) {
                     form.privacy.input.removeClass('error')
-                    $(`#${form.id} .status-message#${form.privacy.input.attr('id')}`).css('display', 'none')
+                    $(`#${form.id} .${config.messages.elementClass}#${form.privacy.input.attr('id')}`).css('display', 'none')
                     form.privacy.valid = true;
                 } else {
                     form.privacy.input.addClass('error')
-                    $(`#${form.id} .status-message#${form.privacy.input.attr('id')}`).text(form.privacy.input.data('error-msg'))
-                    $(`#${form.id} .status-message#${form.privacy.input.attr('id')}`).css('display', 'flex')
+                    $(`#${form.id} .${config.messages.elementClass}#${form.privacy.input.attr('id')}`).text(form.privacy.input.data('error-msg'))
+                    $(`#${form.id} .${config.messages.elementClass}#${form.privacy.input.attr('id')}`).css('display', 'flex')
                     form.privacy.valid = false;
                 }
             }
@@ -412,8 +440,10 @@ $(document).ready(() => {
         });
 
         /* animate back up to submission message */
-        $([document.documentElement, document.body]).animate({
-            scrollTop: form.object.jquery.offset().top - 280
-        }, 1000);
+        if (config.messages.scrollTo) {
+            $([document.documentElement, document.body]).animate({
+                scrollTop: form.object.jquery.offset().top - 280
+            }, 1000);
+        }
     }
 })

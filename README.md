@@ -8,7 +8,21 @@ This tool as it stands is only compatible with submission forms (contact forms, 
 
 With each form, there is a general form structure you should keep with this plugin to ensure you don't run into any problems. A tool is being worked on for you to create forms online and export them as html code.
 
-At the moment, the tool is minimal in it's configuration. But more configuration tools will be out later.
+### Config
+
+There is a default [`config.js`](https://github.com/TONYCRE8/cre8-form/blob/main/src/config.js) file that you can make changes to, in order to make adjustment to the way that the tool functions. Each of the props does the following:
+
+#### Privacy
+
+Enables the forcing of the privacy check value. If done, you will need to create a checkbox input with the id `privacy`, and add `data-privacy="true"` to the input element as well. You can see an example of this done in the [examples](https://github.com/TONYCRE8/cre8-form/tree/main/examples).
+
+#### Messages
+
+Messages contains all of the default strings and other message related values. The `elementClass` prop within this object will be the default message class for validation messages. The `success` and `error` props are for success and error messages respectively. And finally, the `scrollTo` prop will simply define if you want the page to scroll to the top of the form when the form has been submitted.
+
+#### intTelInput
+
+This object contains all related configurables for the intlTelInput plugin made by [@jackocnr](https://github.com/jackocnr). Enabling it will add the intellisense onto any tel inputs. The `preferredCountries` prop is an array, containing area codes for which countries should appear at the top of the drop-down list. And the `geoIpLookup` object contains two props relating to the geoIpLookup option provided in intlTelInput. One of these is `enabled`, which will enable the option for looking up IPs. The other is `url`, which is the fetch url for whatever api you are using to grab their IP. For more info, take a look at the [intlTelInput documention](https://github.com/jackocnr/intl-tel-input#initialisation-options).
 
 ### Forms
 
@@ -20,7 +34,7 @@ For GDPR and privacy reasons, forms should have an input to ask for permission f
 2. Validate data during post (see [src/validate_form.php](https://github.com/TONYCRE8/cre8-form/blob/main/src/validate_form.php) as an example).
 3. Any other methods you can think of to prevent manipulation of data.
 
-At some point in the future, this form plugin will be more diversified, and will add the option to disable the requirement for a privacy input.
+You can disable the privacy option in the config. But it's recommended that you only do this for unimportant forms where you are not taking any personal information from someone.
 
 ### Inputs
 
@@ -44,7 +58,7 @@ Each input, aside from Telephone numbers, are stored in the following manner:
     'element': $(this),
     'valid': null,
     'focus': false,
-    'message': $(`.status-message#${$(this).attr('id')}`)
+    'message': $(`.${config.messages.elementClass}#${$(this).attr('id')}`)
 }
 
 ```
@@ -73,9 +87,9 @@ The privacy input has a quirk with it's formatting in terms of HTML structure. I
 
 #### Messages
 
-To show validation messages, you should put a `p` element with the class `status-message`, with an id of the input it's validation is for.
+To show validation messages, you should put a `p` element with the class name found in `config.message.elementClass`, with an id of the input it's validation is for.
 
-The entire form should also have a `status-message`, with an id of `complete` and a value of `data-form` set to the name of the form.
+The entire form should also have a `config.message.elementClass`, with an id of `complete` and a value of `data-form` set to the name of the form.
 
 The input itself should have a `data-error-msg` value that shows what the validation message should be. Some inputs, like emails, should also contain a `data-invalid-msg` value.
 
@@ -91,7 +105,9 @@ Email addresses are checked against [RFC 5322](https://datatracker.ietf.org/doc/
 
 #### Tel
 
-Tel inputs use [intlTelInput](https://github.com/TONYCRE8/cre8-form#intltelinput), which has it's own validation method. If you'd prefer, you can always check against [RFC 3966](https://datatracker.ietf.org/doc/html/rfc3966) regex. Currently, there is no option to disable intlTelInput, but a method will be provided later down the line to switch it to using RFC 3966 as a default.
+Tel inputs use [intlTelInput](https://github.com/TONYCRE8/cre8-form#intltelinput), which has it's own validation method. If you'd prefer, you can always check against [RFC 3966](https://datatracker.ietf.org/doc/html/rfc3966) regex. 
+
+Depending on the [config](https://github.com/TONYCRE8/cre8-form#config) settings, the telephone number will either be handled by [intlTelInput](https://github.com/TONYCRE8/cre8-form#intltelinput) validation, or it will be checked against [RFC 3966](https://datatracker.ietf.org/doc/html/rfc3966) regex. The first is arguably the stronger of the two, since it is built to handle all types of phone numbers, and will change it's validation based on what area code is selected. The latter is just a standard regex check, as you can see below.
 
 ```js
 "RFC 3966": /^(?=(?:\+|0{2})?(?:(?:[\(\-\)\.\/ \t\f]*\d){7,10})?(?:[\-\.\/ \t\f]?\d{2,3})(?:[\-\s]?[ext]{1,3}[\-\.\/ \t\f]?\d{1,4})?$)((?:\+|0{2})\d{0,3})?(?:[\-\.\/ \t\f]?)(\(0\d[ ]?\d{0,4}\)|\(\d{0,4}\)|\d{0,4})(?:[\-\.\/ \t\f]{0,2}\d){3,8}(?:[\-\s]?(?:x|ext)[\-\t\f ]?(\d{1,4}))?$/
@@ -130,6 +146,8 @@ An example of a contact form for example, would look like this:
     </form>
 </section>
 ```
+
+The rest of this example can be found in the [contact php example folder](https://github.com/TONYCRE8/cre8-form/tree/main/examples/contact%20php), which includes some php code as well.
 
 There is also a PHP script included in the src, called `validate_form.php`. This script is an example script that you can use to help verify all of your data on the backend too, before processing any of it.
 

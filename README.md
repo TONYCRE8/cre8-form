@@ -8,6 +8,8 @@ This tool as it stands is only compatible with submission forms (contact forms, 
 
 With each form, there is a general form structure you should keep with this plugin to ensure you don't run into any problems. A tool is being worked on for you to create forms online and export them as html code.
 
+At the moment, the tool is minimal in it's configuration. But more configuration tools will be out later.
+
 ### Forms
 
 Each form element should have a `POST` method, and also contain it's post `action`, even if the action is in the same script (i.e. writing `action="contact.php"` in the `contact.php` script). It should also have an `id` and a `name` value.
@@ -21,6 +23,8 @@ For GDPR and privacy reasons, forms should have an input to ask for permission f
 At some point in the future, this form plugin will be more diversified, and will add the option to disable the requirement for a privacy input.
 
 ### Inputs
+
+If you do add multiple forms onto a page, try to diversify the names and ids on the inputs. Each input needs a name and id that are preferrably the same. The plugin should be able to handle multiple forms, but if you have two instances of the id "name" for example, you might run into issues when validating the form. Using prefixes like `contact_name` vs `newsletter_name` might be a good way of separating the two and ensuring the forms are handled correctly.
 
 [Every input should have a label](https://www.w3.org/WAI/tutorials/forms/labels/), all except for the submit button. Each input should also have a name and an id, prefferably ones that are the same (i.e. `name="email" id="email"`).
 
@@ -50,16 +54,19 @@ Telephone numbers are stored differently than any other value. There are slight 
 ```js
 
 {
-    'type': $(this).attr('type'),
-    'id': $(this).attr('id'),
-    'formType': form.type,
+    // ... other default values
     'element': this,
-    'valid': null,
-    'focus': false,
-    'message': $(`.status-message#${$(this).attr('id')}`),
     'phone': null
 }
 
+```
+
+The privacy input has a quirk with it's formatting in terms of HTML structure. It's best to surround the input with it's label, otherwise you might click on the label for one form's privacy input, and be taken to a privacy input further up the page. By wrapping the input in a label, this issue is avoided.
+
+```html
+<label id="privacy"><input type='checkbox' name="privacy" id="privacy" data-privacy="true" data-error-msg="Please accept our privacy terms">
+    I am happy for [insert company] to use the personal data provided above to contact me regarding my query.</label>        
+</div>
 ```
 
 ### Validation
@@ -129,6 +136,8 @@ There is also a PHP script included in the src, called `validate_form.php`. This
 ---
 
 ## Dependencies
+
+Dependencies are not stored in this package like a npm project. Rather, you will need to reference the required dependencies somewhere within your files, either through CDN or through installing the files you need. Links to some of the needed files have been provided below.
 
 ### jQuery
 

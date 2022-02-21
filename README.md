@@ -12,6 +12,14 @@ With each form, there is a general form structure you should keep with this plug
 
 Each form element should have a `POST` method, and also contain it's post `action`, even if the action is in the same script (i.e. writing `action="contact.php"` in the `contact.php` script). It should also have an `id` and a `name` value.
 
+For GDPR and privacy reasons, forms should have an input to ask for permission from users to store information entered into the form. This is where the privacy check comes in. If an input is labelled with the name or id of `privacy`, it will register as a privacy input, and not be stored in the forms fields. It will be used as a check after every other field in the form has been validated. After privacy is then checked, the submit button will be re-enabled. In case someone removes the disabled attribute on the submit button via inspect element, you should always:
+
+1. Add styles to prevent submission (i.e. [pointer events](https://developer.mozilla.org/en-US/docs/Web/CSS/pointer-events)).
+2. Validate data during post (see [src/validate_form.php](https://github.com/TONYCRE8/cre8-form/blob/main/src/validate_form.php) as an example).
+3. Any other methods you can think of to prevent manipulation of data.
+
+At some point in the future, this form plugin will be more diversified, and will add the option to disable the requirement for a privacy input.
+
 ### Inputs
 
 [Every input should have a label](https://www.w3.org/WAI/tutorials/forms/labels/), all except for the submit button. Each input should also have a name and an id, prefferably ones that are the same (i.e. `name="email" id="email"`).
@@ -56,7 +64,7 @@ Telephone numbers are stored differently than any other value. There are slight 
 
 ### Validation
 
-### Messages
+#### Messages
 
 To show validation messages, you should put a `p` element with the class `status-message`, with an id of the input it's validation is for.
 
@@ -74,15 +82,15 @@ Email addresses are checked against [RFC 5322](https://datatracker.ietf.org/doc/
 "RFC 5322": /^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])$/
 ```
 
-#### Telephone
+#### Tel
 
-Telephone inputs use [intlTelInput](https://github.com/TONYCRE8/cre8-form#intltelinput), which has it's own validation method. If you'd prefer, you can always check against [RFC 3966](https://datatracker.ietf.org/doc/html/rfc3966) regex. Currently, there is no option to disable intlTelInput, but a method will be provided later down the line to switch it to using RFC 3966 as a default.
+Tel inputs use [intlTelInput](https://github.com/TONYCRE8/cre8-form#intltelinput), which has it's own validation method. If you'd prefer, you can always check against [RFC 3966](https://datatracker.ietf.org/doc/html/rfc3966) regex. Currently, there is no option to disable intlTelInput, but a method will be provided later down the line to switch it to using RFC 3966 as a default.
 
 ```js
 "RFC 3966": /^(?=(?:\+|0{2})?(?:(?:[\(\-\)\.\/ \t\f]*\d){7,10})?(?:[\-\.\/ \t\f]?\d{2,3})(?:[\-\s]?[ext]{1,3}[\-\.\/ \t\f]?\d{1,4})?$)((?:\+|0{2})\d{0,3})?(?:[\-\.\/ \t\f]?)(\(0\d[ ]?\d{0,4}\)|\(\d{0,4}\)|\d{0,4})(?:[\-\.\/ \t\f]{0,2}\d){3,8}(?:[\-\s]?(?:x|ext)[\-\t\f ]?(\d{1,4}))?$/
 ```
 
-## Example
+### Example
 
 An example of a contact form for example, would look like this:
 

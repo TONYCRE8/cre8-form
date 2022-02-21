@@ -46,17 +46,29 @@ $(document).ready(() => {
             phoneInputs.forEach(phone => {
 
                 /* Format the telephone number, giving information about where the phone number is from and whether there's an extension or not. */
-                var phoneData = phone.getNumber(intlTelInputUtils.numberFormat.RFC3966).slice(4);
-                if (phoneData.includes(';')) {
-                    data.set(phone.a.id, phoneData.substring(0, phoneData.lastIndexOf(';')))
-                } else {
-                    data.set(phone.a.id, phoneData)
+                if (config.intlTelInput.enabled) {
+
+                    var phoneData = phone.getNumber(intlTelInputUtils.numberFormat.RFC3966).slice(4)
+
+                    if (phoneData.includes(';')) {
+                        data.set(phone.a.id, phoneData.substring(0, phoneData.lastIndexOf(';')))
+                    } else {
+                        data.set(phone.a.id, phoneData)
+                    }
+                    var ext = phone.getExtension() ? phone.getExtension() : '';
+                    if (ext != '') {
+                        data.set('ext', ext)
+                    }
+                    data.set('region', phone.getSelectedCountryData().name)
                 }
-                var ext = phone.getExtension() ? phone.getExtension() : '';
-                if (ext != '') {
-                    data.set('ext', ext)
+
+                else {
+
+                    /* do the above, but without the intTelInput stuff */
+
+                    data.set(input.phone.id, input.phone.value)
+
                 }
-                data.set('region', phone.getSelectedCountryData().name)
 
             })
         }
@@ -179,20 +191,25 @@ $(document).ready(() => {
         /* for each input, check if they're of particular types that only need to change on form change */
         form.fields.forEach((input) => {
             if (input.type=='tel') { /* add a phone value in it's constructor? */
-                input.phone = window.intlTelInput(input.element, { /* create intlTelInput on our phone input */
-                    preferredCountries: ["gb", "us", "ca"],
-                    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
-                    separateDialCode: true,
-                    /* unquote if you want to use auto-location */
-                    /* initialCountry: "auto",
-                    geoIpLookup: function(success, failure) {
-                        $.get("https://ipinfo.io/json?token=fae0e1cf113467", function() {}, "jsonp").always(function(resp) {
-                            var countryCode = (resp && resp.country) ? resp.country : "gb";
-                            success(countryCode);
-                        });
-                    }, */
-                })
-                phoneInputs.push(input.phone)
+                if (config.intlTelInput.enabled) {
+                    input.phone = window.intlTelInput(input.element, { /* create intlTelInput on our phone input */
+                        preferredCountries: ["gb", "us", "ca"],
+                        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+                        separateDialCode: true,
+                        /* unquote if you want to use auto-location */
+                        /* initialCountry: "auto",
+                        geoIpLookup: function(success, failure) {
+                            $.get("https://ipinfo.io/json?token=fae0e1cf113467", function() {}, "jsonp").always(function(resp) {
+                                var countryCode = (resp && resp.country) ? resp.country : "gb";
+                                success(countryCode);
+                            });
+                        }, */
+                    })
+
+                    phoneInputs.push(input.phone)
+                } else {
+                    phoneInputs.push(input.element)
+                }
             }
             /* On change radio */
             else if (input.type == 'radio') {
@@ -249,6 +266,9 @@ $(document).ready(() => {
             /* RFC 5322 standard email regex */
             const emailRegX = /^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])$/;
 
+            /* RFC 3966 standard telno regex */
+
+            const telnoRegX = /^(?=(?:\+|0{2})?(?:(?:[\(\-\)\.\/ \t\f]*\d){7,10})?(?:[\-\.\/ \t\f]?\d{2,3})(?:[\-\s]?[ext]{1,3}[\-\.\/ \t\f]?\d{1,4})?$)((?:\+|0{2})\d{0,3})?(?:[\-\.\/ \t\f]?)(\(0\d[ ]?\d{0,4}\)|\(\d{0,4}\)|\d{0,4})(?:[\-\.\/ \t\f]{0,2}\d){3,8}(?:[\-\s]?(?:x|ext)[\-\t\f ]?(\d{1,4}))?$/
             /* Name InputField */
 
             form.fields.forEach((input) => {
@@ -259,15 +279,28 @@ $(document).ready(() => {
                 if (input.focus) {
                     if (input.type == 'tel') {
                         /* Check if the intlTelInput is valid */
-                        if (input.phone.isValidNumber() /* && input.element.val() != '' */ ) {
-                            input.element.classList.remove('error')
-                            input.message.css('display', 'none')
-                            input.valid = true;
+                        if (config.intlTelInput.enabled) {
+                            if (input.phone.isValidNumber() /* && input.element.val() != '' */ ) {
+                                input.element.classList.remove('error')
+                                input.message.css('display', 'none')
+                                input.valid = true;
+                            } else {
+                                input.valid = false;
+                                input.message.text($(input.element).data('error-msg'))
+                                input.element.classList.add('error')
+                                input.message.css('display', 'flex')
+                            }
                         } else {
-                            input.valid = false;
-                            input.message.text($(input.element).data('error-msg'))
-                            input.element.classList.add('error')
-                            input.message.css('display', 'flex')
+                            if (input.element.value != '' && telnoRegX.test(input.element.value)) {
+                                input.element.classList.remove('error')
+                                input.message.css('display', 'none')
+                                input.valid = true;
+                            } else {
+                                input.valid = false;
+                                input.message.text($(input.element).data('error-msg'))
+                                input.element.classList.add('error')
+                                input.message.css('display', 'flex')
+                            }
                         }
                     } else if (input.id == 'email') {
                         /* Check if it matches the RFC 5322 regex */

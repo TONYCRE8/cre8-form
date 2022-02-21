@@ -383,16 +383,4 @@ $(document).ready(() => {
             scrollTop: form.object.jquery.offset().top - 280
         }, 1000);
     }
-
-    /* trigger newsletter menu */
-
-    $('#newsletter-open').on('click', () => {
-        $('.newsletter').css('opacity', '1')
-        $('.newsletter').css('pointer-events', 'auto')
-    })
-
-    $('#newsletter-close').on('click', () => {
-        $('.newsletter').css('opacity', '0')
-        $('.newsletter').css('pointer-events', 'none')
-    })
 })

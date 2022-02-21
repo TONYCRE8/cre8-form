@@ -9,7 +9,7 @@ var config = {
     intlTelInput: {
         enabled: true, // disabling this will default to using RFC 3966 as validation.
         preferred_countries: ['gb', 'us', 'ca'], // used with intlTelInput
-        autolocation: {
+        autolocation: { // find out more here: https://github.com/jackocnr/intl-tel-input#initialisation-options
             enabled: false,
             url: ''
         }

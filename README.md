@@ -4,7 +4,9 @@ A contact form powered by jQuery, built to dynamically handle all forms on any g
 
 ## Usage
 
-There is a general form structure you should keep with this plugin.
+This tool as it stands is only compatible with submission forms (contact forms, newsletter registrations, etc) and is not built to work with systems like account logins.
+
+With each form, there is a general form structure you should keep with this plugin to ensure you don't run into any problems. A tool is being worked on for you to create forms online and export them as html code.
 
 ### Forms
 
@@ -12,15 +14,75 @@ Each form element should have a `POST` method, and also contain it's post `actio
 
 ### Inputs
 
-[Every input should have a label](https://www.w3.org/TR/html401/interact/forms.html#h-17.9), all except for the submit button.
+[Every input should have a label](https://www.w3.org/WAI/tutorials/forms/labels/), all except for the submit button. Each input should also have a name and an id, prefferably ones that are the same (i.e. `name="email" id="email"`).
+
+```html
+<label for="name">Name</label>
+<input type="text" name="name" id="name" placeholder="My name is..." data-error-msg="Please enter your name">
+```
+
+Each input, aside from Telephone numbers, are stored in the following manner:
+
+```js
+
+{
+    'type': $(this).attr('type'),
+    'id': $(this).attr('id'),
+    'formType': form.type,
+    'element': $(this),
+    'valid': null,
+    'focus': false,
+    'message': $(`.status-message#${$(this).attr('id')}`)
+}
+
+```
+
+Telephone numbers are stored differently than any other value. There are slight changes to help handle the [intlTelInput](https://github.com/TONYCRE8/cre8-form#intltelinput) plugin work correctly. They store the element as a dom element rather than a jquery element for compatability's sake, and also have a phone object that the intlTelInput will be attached to.
+
+```js
+
+{
+    'type': $(this).attr('type'),
+    'id': $(this).attr('id'),
+    'formType': form.type,
+    'element': this,
+    'valid': null,
+    'focus': false,
+    'message': $(`.status-message#${$(this).attr('id')}`),
+    'phone': null
+}
+
+```
 
 ### Validation
+
+### Messages
 
 To show validation messages, you should put a `p` element with the class `status-message`, with an id of the input it's validation is for.
 
 The entire form should also have a `status-message`, with an id of `complete` and a value of `data-form` set to the name of the form.
 
 The input itself should have a `data-error-msg` value that shows what the validation message should be. Some inputs, like emails, should also contain a `data-invalid-msg` value.
+
+Whilst inputs like text, dates and radios are all handled very basically. Inputs like emails and telephone numbers are handled in a better way to remove any and all exploits.
+
+#### Email
+
+Email addresses are checked against [RFC 5322](https://datatracker.ietf.org/doc/html/rfc5322) standards. This is to make sure that the address is an actual valid email address. 
+
+```js
+"RFC 5322": /^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])$/
+```
+
+#### Telephone
+
+Telephone inputs use [intlTelInput](https://github.com/TONYCRE8/cre8-form#intltelinput), which has it's own validation method. If you'd prefer, you can always check against [RFC 3966](https://datatracker.ietf.org/doc/html/rfc3966) regex. Currently, there is no option to disable intlTelInput, but a method will be provided later down the line to switch it to using RFC 3966 as a default.
+
+```js
+"RFC 3966": /^(?=(?:\+|0{2})?(?:(?:[\(\-\)\.\/ \t\f]*\d){7,10})?(?:[\-\.\/ \t\f]?\d{2,3})(?:[\-\s]?[ext]{1,3}[\-\.\/ \t\f]?\d{1,4})?$)((?:\+|0{2})\d{0,3})?(?:[\-\.\/ \t\f]?)(\(0\d[ ]?\d{0,4}\)|\(\d{0,4}\)|\d{0,4})(?:[\-\.\/ \t\f]{0,2}\d){3,8}(?:[\-\s]?(?:x|ext)[\-\t\f ]?(\d{1,4}))?$/
+```
+
+## Example
 
 An example of a contact form for example, would look like this:
 
@@ -54,13 +116,15 @@ An example of a contact form for example, would look like this:
 </section>
 ```
 
+There is also a PHP script included in the src, called `validate_form.php`. This script is an example script that you can use to help verify all of your data on the backend too, before processing any of it.
+
 ---
 
 ## Dependencies
 
 ### jQuery
 
-jQuery is a requirement for this build. The current version being used is `3.3.1`, but there shouldn't be any issues with you using a more updated `3.x` or `3.3.x` version.
+jQuery is a requirement for this build. The current version being used is `3.3.1`, but there shouldn't be any issues with you using a more updated `3.x` or `3.3.x` version. If there are, please [create an issue](https://github.com/TONYCRE8/cre8-form/issues).
 
 ### intlTelInput
 

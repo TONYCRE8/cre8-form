@@ -20,9 +20,9 @@ Enables the forcing of the privacy check value. If done, you will need to create
 
 Messages contains all of the default strings and other message related values. The `elementClass` prop within this object will be the default message class for validation messages. The `success` and `error` props are for success and error messages respectively. And finally, the `scrollTo` prop will simply define if you want the page to scroll to the top of the form when the form has been submitted.
 
-#### intTelInput
+#### intlTelInput
 
-This object contains all related configurables for the intlTelInput plugin made by [@jackocnr](https://github.com/jackocnr). Enabling it will add the intellisense onto any tel inputs. The `preferredCountries` prop is an array, containing area codes for which countries should appear at the top of the drop-down list. And the `geoIpLookup` object contains two props relating to the geoIpLookup option provided in intlTelInput. One of these is `enabled`, which will enable the option for looking up IPs. The other is `url`, which is the fetch url for whatever api you are using to grab their IP. For more info, take a look at the [intlTelInput documention](https://github.com/jackocnr/intl-tel-input#initialisation-options).
+This object contains all related configurables for the intlTelInput plugin made by [@jackocnr](https://github.com/jackocnr). Enabling it will add the intellisense onto any tel inputs. The `preferredCountries` prop is an array, containing area codes for which countries should appear at the top of the drop-down list. And the `geoIpLookup` object contains three props relating to the geoIpLookup option provided in intlTelInput. One of these is `enabled`, which will enable the option for looking up IPs. The other is `url`, which is the fetch url for whatever api you are using to grab their IP. The last one is called cookie, which you can use to set a cookie storing their country-code response. It'll first check if the cookie has been set, and if it hasn't it'll create the cookie based on whatever `url` api is being called to grab that information. For more info, take a look at the [intlTelInput documention](https://github.com/jackocnr/intl-tel-input#initialisation-options).
 
 ### Forms
 

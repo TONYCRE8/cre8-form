@@ -137,8 +137,8 @@ $(document).ready(() => {
         })
         if (isTrue) {
             /* and if it all is true... */
-            if (config.privacy) {
-                if (form.privacy.valid || !config.privacy) {
+            if (config.privacy.enabled) {
+                if (form.privacy.valid || !config.privacy.enabled) {
                     /* ... and if the privacy is valid as well */
                     form.valid = true; /* then the whole form is valid */
                     $(`#${form.id} #submit`).val('Send') /* enable the send button */

@@ -216,10 +216,24 @@ window.onload = () => {
                                 separateDialCode: true,
                                 initialCountry: "auto",
                                 geoIpLookup: function(success, failure) {
-                                    $.get(config.intlTelInput.geoIpLookup.url, function() {}, "jsonp").always(function(resp) {
-                                        var countryCode = (resp && resp.country) ? resp.country : "gb";
-                                        success(countryCode);
-                                    });
+                                    if (config.intlTelInput.geoIpLookup.cookie.enabled) {
+                                        let country = getCookie(config.intlTelInput.geoIpLookup.cookie.name);
+                                        if (country != "") {
+                                            var countryCode = country
+                                            success(countryCode);
+                                        } else {
+                                            $.get(config.intlTelInput.geoIpLookup.url, function() {}, "jsonp").always(function(resp) {
+                                                var countryCode = (resp && resp.country) ? resp.country : "gb";
+                                                document.cookie = config.intlTelInput.geoIpLookup.cookie.name + '=' + countryCode + ';expires'+ config.intlTelInput.geoIpLookup.cookie.duration + ';path=/'
+                                                success(countryCode);
+                                            });
+                                        }
+                                    } else {
+                                        $.get(config.intlTelInput.geoIpLookup.url, function() {}, "jsonp").always(function(resp) {
+                                            var countryCode = (resp && resp.country) ? resp.country : "gb";
+                                            success(countryCode);
+                                        });
+                                    }
                                 },
                             })
                         } else {
@@ -442,6 +456,24 @@ window.onload = () => {
                 }, 1000);
             }
         }
+
+        // misc cookie stuff
+
+        function getCookie(cname) {
+            let name = cname + "=";
+            let ca = document.cookie.split(';');
+            for(let i = 0; i < ca.length; i++) {
+              let c = ca[i];
+              while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+              }
+              if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+              }
+            }
+            return "";
+          }
+
     } else {
         console.error('cre8 form: jQuery hasn\'nt been loaded')
     }

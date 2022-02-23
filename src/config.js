@@ -15,6 +15,11 @@ var config = {
         preferredCountries: ['gb', 'us', 'ca'], // used with intlTelInput
         geoIpLookup: { // find out more here: https://github.com/jackocnr/intl-tel-input#initialisation-options
             enabled: false,
+            cookie: {
+                enabled: true,
+                name: 'country',
+                duration: 7
+            },
             url: ''
         }
     },

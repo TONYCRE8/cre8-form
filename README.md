@@ -14,7 +14,7 @@ There is a default [`config.js`](https://github.com/TONYCRE8/cre8-form/blob/main
 
 #### Privacy
 
-Enables the forcing of the privacy check value. If done, you will need to create a checkbox input with the id `privacy`, and add `data-privacy="true"` to the input element as well. You can see an example of this done in the [examples](https://github.com/TONYCRE8/cre8-form/tree/main/examples).
+Enables the forcing of the privacy check value. If done, you will need to create a checkbox input with the id set to your `config.privacy.elementID` in your `config.js` file, and add `data-privacy="true"` to the input element as well. You can see an example of this done in the [examples](https://github.com/TONYCRE8/cre8-form/tree/main/examples).
 
 #### Messages
 
@@ -28,7 +28,7 @@ This object contains all related configurables for the intlTelInput plugin made 
 
 Each form element should have a `POST` method, and also contain it's post `action`, even if the action is in the same script (i.e. writing `action="contact.php"` in the `contact.php` script). It should also have an `id` and a `name` value.
 
-For GDPR and privacy reasons, forms should have an input to ask for permission from users to store information entered into the form. This is where the privacy check comes in. If an input is labelled with the name or id of `privacy`, it will register as a privacy input, and not be stored in the forms fields. It will be used as a check after every other field in the form has been validated. After privacy is then checked, the submit button will be re-enabled. In case someone removes the disabled attribute on the submit button via inspect element, you should always:
+For GDPR and privacy reasons, forms should have an input to ask for permission from users to store information entered into the form. This is where the privacy check comes in. If an input is labelled with the name or id that is the same as the `config.privacy.elementID`, it will register as a privacy input, and not be stored in the forms fields. It will be used as a check after every other field in the form has been validated. After privacy is then checked, the submit button will be re-enabled. In case someone removes the disabled attribute on the submit button via inspect element, you should always:
 
 1. Add styles to prevent submission (i.e. [pointer events](https://developer.mozilla.org/en-US/docs/Web/CSS/pointer-events)).
 2. Validate data during post (see [src/validate_form.php](https://github.com/TONYCRE8/cre8-form/blob/main/src/validate_form.php) as an example).

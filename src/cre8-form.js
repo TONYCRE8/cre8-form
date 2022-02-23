@@ -14,8 +14,8 @@ $(document).ready(() => {
                 },
                 'fields': [],
                 'privacy': {
-                    'input': $('#' + $(this).attr('id') + ' input[data-privacy="true"]'),
-                    'valid': null,
+                    'input': $(`#${$(this).attr('id')} input[data-privacy="true"]`),
+                    'valid': false,
                 },
                 'valid': false,
                 'message': $(`.${config.messages.elementClass}#complete[data-form='${$(this).attr('id')}']`),
@@ -130,15 +130,15 @@ $(document).ready(() => {
 
     /* Check Valid */
 
-    const checkValid = (form) => {
+    const checkValid = (f) => {
         var isTrue = form.fields.every((v) => {
             /* Set to true if every input is true */
             return v.valid === true;
         })
         if (isTrue) {
             /* and if it all is true... */
-            if (config.privacy.enabled) {
-                if (form.privacy.valid || !config.privacy.enabled) {
+            if (config.privacy) {
+                if (form.privacy.valid || !config.privacy) {
                     /* ... and if the privacy is valid as well */
                     form.valid = true; /* then the whole form is valid */
                     $(`#${form.id} #submit`).val('Send') /* enable the send button */
@@ -425,7 +425,7 @@ $(document).ready(() => {
     })
 
     const resetForm = (form) => {
-        form.object.jquery.find('textarea, :text, input[type="tel"], input[type="date"]').val('')
+        form.object.jquery.find('textarea, :text, input[type="tel"], input[type="date"], input[type="month"]').val('')
         form.object.jquery.find(':checkbox, :radio').prop('checked', false)
 
         /* Reset button and status message text */

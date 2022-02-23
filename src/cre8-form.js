@@ -1,9 +1,5 @@
 $(document).ready(() => {
 
-    if ($('#name')) {
-        $('#name').focus()
-    }
-
     var forms = []
 
     $('form').each(function () { // For some reason, () => {} doesn't work as a function here?

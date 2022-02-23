@@ -2,7 +2,7 @@ var config = {
     // defaults
     privacy: {
         enabled: true,
-        elementID: '#privacy'
+        elementID: 'privacy'
     },
     messages: {
         elementClass: 'status-message',

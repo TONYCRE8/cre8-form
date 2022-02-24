@@ -39,14 +39,6 @@ window.onload = () => {
             forms.push(form)
             
         });
-
-        console.log(forms)
-
-        /*
-        EDGE CASE: 
-        what if we have multiple telephone inputs on a page?
-        perhaps make phone inputs as an array?
-        */
         
         var phoneInputs = [];
 
@@ -203,7 +195,7 @@ window.onload = () => {
                 }
             });
 
-            console.log(form.fields)
+            /* console.log(form.fields) */
 
             /* for each input, check if they're of particular types that only need to change on form change */
             form.fields.forEach((input) => {

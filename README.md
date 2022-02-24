@@ -38,6 +38,22 @@ You can disable the privacy option in the config. But it's recommended that you 
 
 ### Inputs
 
+There are only a select number of input types accepted by cre8-form, mostly due to the overall usage of the other input types and also that some features (like passwords) haven't been made for cre8-form as of yet. Here is a list of the supported input types:
+
+```html
+<input type="text">
+<input type="email">
+<input type="tel">
+<input type="date">
+<input type="month">
+<input type="checkbox">
+<input type="radio">
+<input type="button">
+<input type="submit">
+```
+
+More support for different input types will be added and updated at a later time.
+
 If you do add multiple forms onto a page, try to diversify the names and ids on the inputs. Each input needs a name and id that are preferrably the same. The plugin should be able to handle multiple forms, but if you have two instances of the id "name" for example, you might run into issues when validating the form. Using prefixes like `contact_name` vs `newsletter_name` might be a good way of separating the two and ensuring the forms are handled correctly.
 
 [Every input should have a label](https://www.w3.org/WAI/tutorials/forms/labels/), all except for the submit button. Each input should also have a name and an id, prefferably ones that are the same (i.e. `name="email" id="email"`).

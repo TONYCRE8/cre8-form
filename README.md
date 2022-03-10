@@ -95,8 +95,7 @@ The privacy input has a quirk with it's formatting in terms of HTML structure. I
 
 ```html
 <label id="privacy"><input type='checkbox' name="privacy" id="privacy" data-privacy="true" data-error-msg="Please accept our privacy terms">
-    I am happy for [insert company] to use the personal data provided above to contact me regarding my query.</label>        
-</div>
+I am happy for [insert company] to use the personal data provided above to contact me regarding my query.</label>
 ```
 
 ### Validation
